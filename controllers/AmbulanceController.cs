@@ -1,30 +1,101 @@
-using AidMate.Models;
 using Microsoft.AspNetCore.Mvc;
+using AidMate.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using AidMate.Services;
+using System;
 
-namespace Aidmate.Controllers{
-  [ApiController]
-[Route("[controller]")]
-public class AmbulancesController : ControllerBase
+namespace AidMate.Controllers
 {
-    private readonly IAmbulanceService _service;
-    public AmbulancesController(IAmbulanceService service) => _service = service;
+    [ApiController]
+    [Route("[controller]")]
+    public class AmbulancesController : ControllerBase
+    {
+        private readonly IAmbulanceService _service;
 
-    [HttpGet]
-    public async Task<List<AmbulanceModel>> Get() => await _service.Get();
+        public AmbulancesController(IAmbulanceService service) => _service = service;
 
-    [HttpGet("{id}")]
-    public async Task<AmbulanceModel?> GetById(string id) => await _service.GetById(id);
+        [HttpGet("SearchByTypeOrAvailability")]
+        public async Task<ActionResult<List<AmbulanceModel>>> Get([FromQuery] string? type, [FromQuery] bool? isAvailable)
+        {
+            try
+            {
+                var ambulances = await _service.Get(type, isAvailable);
+                if (ambulances == null || ambulances.Count == 0)
+                    return NotFound("No ambulances found with the specified criteria.");
+                return Ok(ambulances);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
-    [HttpPost]
-    public async Task<List<AmbulanceModel>> Add(AmbulanceModel ambulance)
-        => await _service.Add(ambulance);
+        [HttpGet("SearchById/{id}")]
+        public async Task<ActionResult<AmbulanceModel?>> GetById(string id)
+        {
+            try
+            {
+                var ambulance = await _service.GetById(id);
+                return ambulance == null ? NotFound("Ambulance not found.") : Ok(ambulance);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
-    [HttpPut("{id}")]
-    public async Task<List<AmbulanceModel>> Update(string id, AmbulanceModel ambulance)
-        => await _service.Update(id, ambulance);
+        [HttpPost("AddAmbulance")]
+        public async Task<ActionResult> Add([FromBody] AmbulanceModel ambulance)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(ambulance.PlateNumber))
+                    return BadRequest("Plate Number is required.");
 
-    [HttpDelete("{id}")]
-    public async Task<List<AmbulanceModel>> Delete(string id)
-        => await _service.Delete(id);
-}
+                await _service.Add(ambulance);
+                return Ok(new { message = "Ambulance added successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPut("Update/{id}")]
+        public async Task<ActionResult> Update(string id, [FromBody] AmbulanceModel ambulance)
+        {
+            try
+            {
+                var existingAmbulance = await _service.GetById(id);
+                if (existingAmbulance == null)
+                    return NotFound("Ambulance not found.");
+
+                await _service.Update(id, ambulance);
+                return Ok(new { message = "Ambulance updated successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpDelete("Delete/{id}")]
+        public async Task<ActionResult> Delete(string id)
+        {
+            try
+            {
+                var ambulance = await _service.GetById(id);
+                if (ambulance == null)
+                    return NotFound("Ambulance not found.");
+
+                await _service.Delete(id);
+                return Ok(new { message = "Ambulance deleted successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+    }
 }
