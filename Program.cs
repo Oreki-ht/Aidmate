@@ -10,6 +10,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IParamedicService, ParamedicService>();
 builder.Services.AddSingleton<IAmbulanceService, AmbulanceService>();
 builder.Services.AddSingleton<IPatientService, PatientService>();
+builder.Services.AddSingleton<ITreatmentService, TreatmentService>();
 var app = builder.Build();
 
 // Enable Swagger UI in Development Mode
