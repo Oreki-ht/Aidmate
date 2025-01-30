@@ -3,18 +3,19 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace AidMate.Models
 {
-    public class ParamedicModel
+    public class TreatmentModel
     {
         [BsonId]
         [BsonRepresentation(BsonType.String)]
         public string? Id { get; set; }
 
         [BsonRequired]
-        public string Name { get; set; }
+        public string ParamedicId { get; set; }
 
         [BsonRequired]
-        public string Qualification { get; set; }
+        public string PatientId { get; set; }
 
-        public int YearsOfExperience { get; set; }
+        public string Notes { get; set; }
+        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     }
 }
