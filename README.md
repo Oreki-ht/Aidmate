@@ -1,0 +1,1 @@
+AidMate is a simple WebAPI application for managing paramedics, ambulances, and patients, storing data in MongoDB. It provides basic CRUD operations and a Swagger interface to explore and interact with the API.

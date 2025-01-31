@@ -21,7 +21,7 @@ namespace AidMate.Controllers
             try
             {
                 var paramedics = await _service.Get(name, qualification);
-                if (paramedics == null || paramedics.Count == 0)
+                if (paramedics.Count() == 0)
                     return NotFound("No paramedics found with the specified criteria.");
                 return Ok(paramedics);
             }

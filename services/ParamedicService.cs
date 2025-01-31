@@ -4,7 +4,7 @@ public class ParamedicService : IParamedicService
 {
     private readonly List<ParamedicModel> _store = new();
 
-    public async Task<List<ParamedicModel>> Get() => await Task.FromResult(_store);
+    public async Task<List<ParamedicModel>> Get(string? name, string? qualification) => await Task.FromResult(_store);
 
     public async Task<ParamedicModel?> GetById(string id)
         => await Task.FromResult(_store.FirstOrDefault(p => p.Id == id));

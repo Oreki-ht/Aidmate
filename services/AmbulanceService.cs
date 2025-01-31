@@ -4,7 +4,7 @@ public class AmbulanceService : IAmbulanceService
 {
     private readonly List<AmbulanceModel> _store = new();
 
-    public async Task<List<AmbulanceModel>> Get() => await Task.FromResult(_store);
+    public async Task<List<AmbulanceModel>> Get(string? type, bool? isAvailable) => await Task.FromResult(_store);
 
     public async Task<AmbulanceModel?> GetById(string id)
         => await Task.FromResult(_store.FirstOrDefault(a => a.Id == id));

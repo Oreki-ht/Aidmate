@@ -4,7 +4,7 @@ public class PatientService : IPatientService
 {
     private readonly List<PatientModel> _store = new();
 
-    public async Task<List<PatientModel>> Get() => await Task.FromResult(_store);
+    public async Task<List<PatientModel>> Get(string? name, bool? isCritical) => await Task.FromResult(_store);
 
     public async Task<PatientModel?> GetById(string id)
         => await Task.FromResult(_store.FirstOrDefault(p => p.Id == id));

@@ -29,3 +29,4 @@ C:\Users\user\AidMate-CS\aidmate\obj\Debug\net6.0\staticwebassets.build.json
 C:\Users\user\AidMate-CS\aidmate\obj\Debug\net6.0\staticwebassets.development.json
 C:\Users\user\AidMate-CS\aidmate\obj\Debug\net6.0\scopedcss\bundle\aidmate.styles.css
 C:\Users\user\AidMate-CS\aidmate\obj\Debug\net6.0\aidmate.csproj.CopyComplete
+C:\Users\user\AidMate-CS\aidmate\bin\Debug\net6.0\appsettings.json

@@ -10,10 +10,10 @@ namespace AidMate.Models
         public string? Id { get; set; }
 
         [BsonRequired]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [BsonRequired]
-        public string Qualification { get; set; }
+        public string? Qualification { get; set; }
 
         public int YearsOfExperience { get; set; }
     }
