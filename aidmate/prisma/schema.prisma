@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Case severity enum
+enum CaseSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// Case status enum
+enum CaseStatus {
+  NEW
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum Role {
+  MEDICAL_DIRECTOR
+  PARAMEDIC
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdCases  Case[] @relation("CreatedCases")
+  assignedCases Case[] @relation("AssignedCases")
+}
+
+// Case model
+model Case {
+  id            String      @id @default(cuid())
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  // Case details
+  patientName   String?
+  patientAge    Int?
+  patientGender String?
+  location      String
+  latitude      Float?
+  longitude     Float?
+  description   String      @db.Text
+  severity      CaseSeverity
+  status        CaseStatus  @default(NEW)
+  notes         String?     @db.Text
+  
+  // Relationships
+  directorId    String      // Who created the case
+  director      User        @relation(name: "CreatedCases", fields: [directorId], references: [id])
+  paramedicId   String?     // Who is assigned to the case
+  paramedic     User?       @relation(name: "AssignedCases", fields: [paramedicId], references: [id])
+  treatmentNotes    TreatmentNote[]
+  medicalReport     MedicalReport?
+}
+
+model TreatmentNote {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  timestamp DateTime @default(now())
+  
+  caseId    String
+  case      Case     @relation(fields: [caseId], references: [id])
+}
+
+model MedicalReport {
+  id                String   @id @default(cuid())
+  treatmentSummary  String   @db.Text
+  patientStatus     String
+  hospitalTransfer  Boolean  @default(false)
+  hospitalName      String?
+  recommendations   String   @db.Text
+  createdAt         DateTime @default(now())
+  
+  caseId            String   @unique  // One-to-one with Case
+  case              Case     @relation(fields: [caseId], references: [id])
+}

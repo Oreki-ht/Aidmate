@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes glow-text-blue {
+  0% {
+    text-shadow: 0 0 0px #007BFF;
+  }
+  50% {
+    text-shadow: 0 0 15px #007BFF, 0 0 20px #007BFF;
+  }
+  100% {
+    text-shadow: 0 0 0px #007BFF;
+  }
+}
+
+@keyframes slide-glow {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.text-glow-blue {
+  animation: glow-text-blue 3s infinite;
+}
+
+.text-glow-slide {
+  background: linear-gradient(
+    to right,
+    #007BFF,
+    #3395FF,
+    #007BFF
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: slide-glow 3s linear infinite;
+}
+
+.hero-decoration {
+  position: relative;
+}
+
+.hero-decoration::before, 
+.hero-decoration::after {
+  content: '';
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  animation: morph 8s linear infinite alternate;
+  z-index: -1;
+  opacity: 0.2;
+}
+
+.hero-decoration::before {
+  background-color: #007BFF;
+  top: -10px;
+  left: -30px;
+  animation-delay: 0s;
+}
+
+.hero-decoration::after {
+  background-color: #2ECC71;
+  bottom: -15px;
+  right: -20px;
+  animation-delay: -4s;
+}
+
+@keyframes morph {
+  0% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+  25% { border-radius: 58% 42% 75% 25% / 76% 46% 54% 24%; }
+  50% { border-radius: 50% 50% 33% 67% / 55% 27% 73% 45%; }
+  75% { border-radius: 33% 67% 58% 42% / 63% 68% 32% 37%; }
+  100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+}
+
+.floating {
+  animation: floating 5s ease-in-out infinite;
+}
+
+@keyframes floating {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
