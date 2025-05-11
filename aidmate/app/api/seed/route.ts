@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 
 export async function GET() {
   try {
-    // Check if users already exist to prevent duplicates
     const existingUsers = await prisma.user.findMany();
     if (existingUsers.length > 0) {
       return NextResponse.json({ 
@@ -13,7 +12,6 @@ export async function GET() {
       });
     }
 
-    // Create a medical director
     const hashedPassword1 = await bcrypt.hash("director123", 10);
     await prisma.user.create({
       data: {

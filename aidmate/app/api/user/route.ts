@@ -20,7 +20,7 @@ export async function GET(request: Request) {
 
     // Apply role filter if provided and validate it's a valid role
     const where = roleParam && ['MEDICAL_DIRECTOR', 'PARAMEDIC'].includes(roleParam) 
-      ? { role: roleParam as any } 
+      ? { role: roleParam as any, availability: true } 
       : {};
 
     const users = await prisma.user.findMany({

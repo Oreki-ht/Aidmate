@@ -5,18 +5,18 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 export async function POST(
   request: Request,
-  { params }: { params: { caseId: string } } // Note: This should match the folder name
+  { params }: { params: { caseId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );
     }
-    
+
     // Only directors can assign cases
     if (session.user.role !== "MEDICAL_DIRECTOR") {
       return NextResponse.json(
@@ -24,55 +24,82 @@ export async function POST(
         { status: 403 }
       );
     }
-    
-    const caseId = params.caseId; // Changed from params.id
-    console.log("Assigning case:", caseId);
-    
+
+    const caseId = params.caseId;
     const { paramedicId } = await request.json();
-    console.log("To paramedic:", paramedicId);
-    
+
     if (!paramedicId) {
       return NextResponse.json(
         { error: "Missing paramedic ID" },
         { status: 400 }
       );
     }
-    
-    // Check if the case exists
-    const existingCase = await prisma.case.findUnique({
+
+    // Fetch the case details
+    const caseData = await prisma.case.findUnique({
       where: { id: caseId },
     });
-    
-    if (!existingCase) {
+
+    if (!caseData) {
       return NextResponse.json(
         { error: "Case not found" },
         { status: 404 }
       );
     }
-    
-    // Check if the paramedic exists and has the right role
-    const paramedic = await prisma.user.findUnique({
-      where: { id: paramedicId },
-    });
-    
-    if (!paramedic || paramedic.role !== "PARAMEDIC") {
+
+    const { latitude: caseLat, longitude: caseLng } = caseData;
+
+    if (caseLat === null || caseLng === null) {
       return NextResponse.json(
-        { error: "Invalid paramedic ID or user is not a paramedic" },
+        { error: "Case location is incomplete" },
         { status: 400 }
       );
     }
-    
-    // Update the case - Note: case is lowercase in the Prisma client
-    const updatedCase = await prisma.case.update({
-      where: { id: caseId },
-      data: {
-        paramedicId,
-        status: "ASSIGNED",
+
+    // Fetch available paramedics
+    const paramedics = await prisma.user.findMany({
+      where: {
+        role: "PARAMEDIC",
+        availability: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        latitude: true,
+        longitude: true,
       },
     });
-    
-    console.log("Case updated successfully:", updatedCase);
-    return NextResponse.json({ case: updatedCase });
+
+    // Calculate distances using the Haversine formula
+    const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
+    const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
+      const R = 6371; // Earth's radius in km
+      const dLat = toRadians(lat2 - lat1);
+      const dLng = toRadians(lng2 - lng1);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRadians(lat1)) *
+          Math.cos(toRadians(lat2)) *
+          Math.sin(dLng / 2) *
+          Math.sin(dLng / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c; // Distance in km
+    };
+
+    const distances = paramedics.map((paramedic) => ({
+      ...paramedic,
+      distance: calculateDistance(
+        caseLat,
+        caseLng,
+        paramedic.latitude!,
+        paramedic.longitude!
+      ),
+    }));
+
+    // Sort paramedics by proximity
+    distances.sort((a, b) => a.distance - b.distance);
+
+    return NextResponse.json({ paramedics: distances });
   } catch (error) {
     console.error("Error assigning case:", error);
     return NextResponse.json(

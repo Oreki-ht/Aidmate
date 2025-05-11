@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 
 type Case = {
@@ -43,6 +43,13 @@ export default function CasePage() {
   const router = useRouter();
   const params = useParams();
   const caseId = params.caseId as string;
+
+  const reportRef = useRef<HTMLDivElement>(null);
+  const scrollToReport = () => {
+  if (reportRef.current) {
+    reportRef.current.scrollIntoView({ behavior: "smooth" });
+  }
+};
 
   const [caseData, setCaseData] = useState<Case | null>(null);
   const [loading, setLoading] = useState(true);
@@ -252,12 +259,15 @@ export default function CasePage() {
               </button>
             )}
             {caseData.status === "IN_PROGRESS" && !showReportForm && (
-              <button 
-                onClick={() => setShowReportForm(true)}
+                <button 
+                onClick={() => {
+                  setShowReportForm(true);
+                  scrollToReport();
+                }}
                 className="bg-mint-dark hover:bg-mint-dark/90 text-white px-4 py-2 rounded-md font-medium"
-              >
+                >
                 Complete Case
-              </button>
+                </button>
             )}
           </div>
         )}
@@ -391,7 +401,7 @@ export default function CasePage() {
 
       {/* Medical Report Form */}
       {showReportForm && (
-        <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
+        <div ref={reportRef} className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
           <h2 className="text-xl font-semibold text-charcoal mb-4">Complete Medical Report</h2>
           <form onSubmit={handleSubmitReport} className="space-y-6">
             <div>

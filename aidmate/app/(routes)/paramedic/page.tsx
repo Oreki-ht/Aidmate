@@ -3,7 +3,12 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const DynamicMapPicker = dynamic(
+  () => import("@/app/components/ui/MapPicker").then((mod) => mod.DynamicMapPicker),
+  { ssr: false }
+);
 
 type Case = {
   id: string;
@@ -21,6 +26,34 @@ export default function ParamedicDashboardPage() {
   const [assignedCases, setAssignedCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [availability, setAvailability] = useState(true);
+   const [showMapPicker, setShowMapPicker] = useState(false);
+  const [location, setLocation] = useState("");
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
+
+  const handleLocationSave = async (address: string, lat: number, lng: number) => {
+    setLocation(address);
+    setLatitude(lat);
+    setLongitude(lng);
+
+    try {
+      const response = await fetch("/api/paramedic/location", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ location: address, latitude: lat, longitude: lng }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update location");
+      }
+
+      alert("Location updated successfully!");
+    } catch (err) {
+      console.error("Error updating location:", err);
+      alert("Failed to update location. Please try again.");
+    }
+  };
   
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -44,6 +77,25 @@ export default function ParamedicDashboardPage() {
       setLoading(false);
     }
   };
+
+  const toggleAvailability = async () => {
+  try {
+    const response = await fetch("/api/paramedic/availability", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ availability: !availability }),
+    });
+
+    if (!response.ok) throw new Error("Failed to update availability");
+
+    setAvailability(!availability);
+  } catch (err) {
+    console.error("Error updating availability:", err);
+    alert("Failed to update availability. Please try again.");
+  }
+};
+
+  const completedCasesCount = assignedCases.filter(c => c.status === "COMPLETED").length;
 
   // Get severity badge color
   const getSeverityColor = (severity: string) => {
@@ -126,10 +178,14 @@ export default function ParamedicDashboardPage() {
             </div>
             
             <div>
-              <span className="inline-flex items-center px-3 py-1 rounded-full bg-mint/10 text-mint-dark text-sm font-medium">
-                <div className="w-2 h-2 bg-mint-dark rounded-full mr-2"></div>
-                Available for dispatch
-              </span>
+              <button
+                onClick={toggleAvailability}
+                className={`px-4 py-2 rounded-md font-medium ${
+                  availability ? "bg-mint-dark text-white" : "bg-gray-300 text-gray-700"
+                }`}
+              >
+                {availability ? "Available" : "Unavailable"}
+              </button>
             </div>
           </div>
           
@@ -208,32 +264,45 @@ export default function ParamedicDashboardPage() {
           </button>
         </div>
         
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all flex flex-col h-full">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-charcoal">Location</h2>
-            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-primary">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-              </svg>
-            </div>
+        <div className="mt-6 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <h2 className="text-lg font-semibold text-charcoal mb-4">Update Your Location</h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-charcoal-light mb-1">
+              Current Location
+            </label>
+            <input
+              type="text"
+              value={location}
+              readOnly
+              onClick={() => setShowMapPicker(true)}
+              className="w-full px-3 py-2 bg-surface border border-gray-200 rounded-lg text-charcoal focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer"
+              placeholder="Click to select your location on the map"
+            />
           </div>
-          
-          <div className="p-1 bg-surface rounded-lg mb-4 flex-1 min-h-[100px]">
-            <div className="rounded-lg w-full h-full min-h-[100px] bg-primary/5 flex items-center justify-center">
-              <span className="text-charcoal-light text-sm">Downtown Medical Center</span>
-            </div>
-          </div>
-          
-          <button 
-            className="mt-auto w-full bg-white border border-gray-200 text-primary hover:bg-primary/5 transition-all font-medium py-2.5 rounded-xl flex items-center justify-center gap-2"
+          {latitude !== null && longitude !== null && (
+            <p className="text-sm text-charcoal-light">
+              Coordinates: {latitude.toFixed(6)}, {longitude.toFixed(6)}
+            </p>
+          )}
+          <button
+            onClick={() => setShowMapPicker(true)}
+            className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg"
           >
-            Update Location
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-            </svg>
+            Select Location
           </button>
         </div>
+      </div>
+
+      {showMapPicker && (
+        <DynamicMapPicker
+          isOpen={showMapPicker}
+          onClose={() => setShowMapPicker(false)}
+          onSave={handleLocationSave}
+          initialLocation={location}
+          initialCoordinates={[latitude || 0, longitude || 0]}
+        />
+      )}
       </div>
       
       {/* Assigned cases table */}
