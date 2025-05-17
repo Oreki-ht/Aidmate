@@ -27,10 +27,11 @@ export default function ParamedicDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [availability, setAvailability] = useState(true);
-   const [showMapPicker, setShowMapPicker] = useState(false);
+  const [showMapPicker, setShowMapPicker] = useState(false);
   const [location, setLocation] = useState("");
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   const handleLocationSave = async (address: string, lat: number, lng: number) => {
     setLocation(address);
@@ -62,6 +63,72 @@ export default function ParamedicDashboardPage() {
       fetchAssignedCases();
     }
   }, [status, router, session]);
+
+    useEffect(() => {
+    if (!('Notification' in window)) {
+      console.log('This browser does not support notifications');
+      return;
+    }
+    
+    if (Notification.permission === 'granted') {
+      setNotificationsEnabled(true);
+    }
+    }, []);
+
+  const registerForNotifications = async () => {
+    try {
+      // Request permission
+      const permission = await Notification.requestPermission();
+      
+      if (permission !== 'granted') {
+        console.log('Notification permission denied');
+        return;
+      }
+      
+      // Register service worker
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      console.log('Service Worker registered');
+      
+      // Subscribe to push notifications
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY as string)
+      });
+      
+      console.log('Subscribed to push notifications');
+      
+      // Send subscription to server
+      await fetch('/api/paramedic/notifications/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(subscription),
+      });
+      
+      setNotificationsEnabled(true);
+      alert('You will now receive notifications when assigned new cases');
+    } catch (error) {
+      console.error('Error registering for notifications:', error);
+      alert('Failed to enable notifications. Please try again.');
+    }
+  };
+
+  // Helper function to convert base64 to Uint8Array
+  const urlBase64ToUint8Array = (base64String: string) => {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+    
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  };
   
   const fetchAssignedCases = async () => {
     try {
@@ -175,6 +242,24 @@ export default function ParamedicDashboardPage() {
               <p className="text-charcoal-light mt-2 max-w-xl">
                 You're on active duty. Check your assigned cases and respond to emergency calls below.
               </p>
+            </div>
+            <div className="mt-4">
+              <button
+                onClick={registerForNotifications}
+                disabled={notificationsEnabled}
+                className={`px-4 py-2 rounded-md font-medium ${
+                  notificationsEnabled 
+                    ? 'bg-gray-300 text-gray-700' 
+                    : 'bg-mint-dark text-white hover:bg-mint-dark/90'
+                }`}
+              >
+                {notificationsEnabled ? 'Notifications Enabled' : 'Enable Notifications'}
+              </button>
+              {notificationsEnabled && (
+                <p className="text-sm text-gray-500 mt-1">
+                  You will receive a notification when a new case is assigned to you.
+                </p>
+              )}
             </div>
             
             <div>

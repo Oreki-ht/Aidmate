@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { sendNotificationToParamedic } from '@/lib/notifications';
 
 export async function POST(
   request: Request,
@@ -98,6 +99,8 @@ export async function POST(
 
     // Sort paramedics by proximity
     distances.sort((a, b) => a.distance - b.distance);
+    
+    await sendNotificationToParamedic(paramedicId, caseId, caseData);
 
     return NextResponse.json({ paramedics: distances });
   } catch (error) {
