@@ -1,4 +1,3 @@
-// filepath: g:\AidMate\aidmate\lib\notifications.ts
 import webpush from 'web-push';
 import prisma from './prisma';
 

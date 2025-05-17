@@ -5,7 +5,7 @@ import './globals.css';
 import { SessionProvider } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import localFont from "next/font/local";
+import { Toaster } from 'react-hot-toast';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -40,6 +40,7 @@ export default function RootLayout({
           <Header />
           <main className="flex-1 p-4 md:p-6 lg:p-8">
             {children}
+            <Toaster position="top-right" />
           </main>
           <Footer />
         </body>

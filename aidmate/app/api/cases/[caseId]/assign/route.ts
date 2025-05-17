@@ -99,10 +99,25 @@ export async function POST(
 
     // Sort paramedics by proximity
     distances.sort((a, b) => a.distance - b.distance);
+
+    const updatedCase = await prisma.case.update({
+      where: { id: caseId },
+      data: { 
+        paramedicId: paramedicId,
+        status: "ASSIGNED"
+      },
+      include: {
+        paramedic: {
+          select: {
+            name: true,
+          },
+        },
+      }
+    });
     
     await sendNotificationToParamedic(paramedicId, caseId, caseData);
 
-    return NextResponse.json({ paramedics: distances });
+    return NextResponse.json({ paramedics: distances, success: true, case: updatedCase });
   } catch (error) {
     console.error("Error assigning case:", error);
     return NextResponse.json(

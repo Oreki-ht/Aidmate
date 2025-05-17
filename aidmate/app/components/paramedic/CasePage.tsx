@@ -73,7 +73,7 @@ export default function CasePage() {
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
-    } else if (status === "authenticated" && session.user.role === "PARAMEDIC") {
+    } else if (status === "authenticated" && session.user.role === "PARAMEDIC" || session?.user.role === "MEDICAL_DIRECTOR") {
       fetchCaseData();
     }
   }, [status, router, session, caseId]);
