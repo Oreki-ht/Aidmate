@@ -5,6 +5,7 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
+import toast from "react-hot-toast"; 
 
 export default function ExperimentalPage() {
   const [query, setQuery] = useState("");
@@ -20,12 +21,11 @@ export default function ExperimentalPage() {
     }
   }, [messages]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!query.trim()) return;
 
     setMessages((prev) => [...prev, { role: "user", content: query }]);
-    setIsLoading(true);
 
     try {
       const apiResponse = await fetch("/api/gemini", {
@@ -57,6 +57,12 @@ export default function ExperimentalPage() {
           predictions: data.predictions,
         },
       ]);
+      
+      // Only show success toast for non-prediction clicks to reduce notification noise
+      if (e) {
+        toast.success("Response received", { duration: 2000 });
+      }
+      
       setQuery("");
     } catch (error) {
       console.error("Error fetching response:", error);
@@ -64,6 +70,9 @@ export default function ExperimentalPage() {
         error instanceof Error
           ? error.message
           : "An error occurred while fetching the response.";
+
+      toast.error(`Error: ${errorMessage}`, { duration: 5000 });
+      
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: `Error: ${errorMessage}` },
@@ -74,34 +83,72 @@ export default function ExperimentalPage() {
   };
 
   const handlePredictionClick = (prediction: string) => {
-        setQuery(prediction);
-        handleSubmit({ preventDefault: () => {} } as React.FormEvent);
-    }
+  try {
+    setQuery(prediction); // This is still useful for showing in the input field
+    
+    // Create a modified version of handleSubmit that uses the prediction directly
+    setMessages((prev) => [...prev, { role: "user", content: prediction }]);
+    setIsLoading(true);
+    
+    // Process the prediction
+    fetch("/api/gemini", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ query: prediction }), // Use prediction directly
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      // Add assistant message
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: data.response,
+          predictions: data.predictions,
+        },
+      ]);
+      
+      setQuery(""); // Clear input after successful response
+    })
+    .catch(error => {
+      console.error("Error fetching response:", error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : "An error occurred while fetching the response.";
+        
+      toast.error(`Error: ${errorMessage}`, { duration: 5000 });
+      
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: `Error: ${errorMessage}` },
+      ]);
+    })
+    .finally(() => {
+      setIsLoading(false);
+    });
+    
+  } catch (error) {
+    toast.error("Failed to process suggested response");
+    console.error("Prediction click error:", error);
+      }
+    };
 
   return (
     <div className="flex flex-col h-screen bg-white rounded-lg">
       {/* Header */}
       <header className="border-b border-gray-200 py-2 px-3 sm:px-4">
         <div className="max-w-4xl mx-auto flex items-center justify-center relative">
-          <Link
-            href="/"
-            className="absolute left-0 inline-flex items-center text-primary hover:text-primary-dark transition-colors text-sm sm:text-base"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <span className="hidden sm:inline">Back to Home</span>
-            <span className="sm:hidden">Back</span>
-          </Link>
           <h1 className="text-lg sm:text-xl text-blue-500 font-bold flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -122,7 +169,7 @@ export default function ExperimentalPage() {
         </div>
       </header>
 
-      {/* Main chat area */}
+      {/* Main chat area remains the same */}
       <main className="flex-grow overflow-y-auto">
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center p-8 text-gray-400">
@@ -249,21 +296,21 @@ export default function ExperimentalPage() {
                     </div>
                   )}
                   {msg.predictions && (
-              <div className="mt-4">
-                <p className="text-sm text-gray-500">Choose a response:</p>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {msg.predictions.map((prediction, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handlePredictionClick(prediction)}
-                      className="px-3 py-1 bg-blue-200 rounded-full text-black text-sm hover:bg-gray-300"
-                    >
-                      {prediction}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+                    <div className="mt-4">
+                      <p className="text-sm text-gray-500">Choose a response:</p>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {msg.predictions.map((prediction, i) => (
+                          <button
+                            key={i}
+                            onClick={() => handlePredictionClick(prediction)}
+                            className="px-3 py-2 bg-blue-100 rounded-lg text-black text-sm hover:bg-blue-200 border border-blue-200"
+                          >
+                            {prediction}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -382,6 +429,11 @@ export default function ExperimentalPage() {
                   type="submit"
                   className="bg-primary hover:bg-primary-dark text-white rounded-full p-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={isLoading || !query.trim()}
+                  onClick={() => {
+                    if (!query.trim()) {
+                      toast.error("Please enter a question");
+                    }
+                  }}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

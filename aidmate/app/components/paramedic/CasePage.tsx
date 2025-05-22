@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 type Case = {
   latitude: any;
@@ -79,15 +80,26 @@ export default function CasePage() {
   }, [status, router, session, caseId]);
 
   const fetchCaseData = async () => {
+    setLoading(true);
     try {
       const response = await fetch(`/api/cases/${caseId}`);
-      if (!response.ok) throw new Error("Failed to fetch case data");
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch case");
+      }
       
       const data = await response.json();
+      
+      if (!data.case) {
+        throw new Error("Case not found");
+      }
+      
       setCaseData(data.case);
-    } catch (err) {
-      console.error("Error fetching case data:", err);
-      setError("Failed to load case data");
+    } catch (error: any) {
+      console.error("Error fetching case:", error);
+      setError(error.message || "Failed to load case data");
+      toast.error(`Error: ${error.message || "Failed to load case data"}`);
     } finally {
       setLoading(false);
     }

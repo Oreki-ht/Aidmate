@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 
 export default function DirectorDashboardPage() {
   const { data: session, status } = useSession();
@@ -27,17 +28,28 @@ export default function DirectorDashboardPage() {
       fetchStatsSummary();
     }
   }, [session, status, router]);
+
+  useEffect(() => {
+    if (session?.user?.name) {
+      toast.success(`Welcome back, ${session.user.name}!`, {
+        icon: '👋',
+      });
+    }
+  }, [session?.user?.name]);
   
   // Fetch stats summary
-  const fetchStatsSummary = async () => {
+    const fetchStatsSummary = async () => {
     try {
       const response = await fetch("/api/cases/stats");
-      if (response.ok) {
-        const data = await response.json();
-        setStatsSummary(data);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch statistics");
       }
-    } catch (error) {
+      const data = await response.json();
+      setStatsSummary(data);
+    } catch (error: any) {
       console.error("Failed to fetch stats:", error);
+      toast.error(`Failed to load statistics: ${error.message || "Unknown error"}`);
     }
   };
   

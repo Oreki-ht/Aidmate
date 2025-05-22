@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import dynamic from 'next/dynamic';
+import toast from 'react-hot-toast';
 
 const DynamicMapPicker = dynamic(
   () => import('../ui/MapPicker').then(mod => mod.DynamicMapPicker),
@@ -55,14 +56,27 @@ export default function CaseForm({ onComplete }: CaseFormProps) {
       latitude,
       longitude,
     });
+    toast.success("Location selected successfully"); // Add success toast
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setFormError("");
+    
+    // Show loading toast
+    const loadingToast = toast.loading("Creating new case...");
 
     try {
+      // Form validation
+      if (!caseData.location || caseData.latitude === 0 || caseData.longitude === 0) {
+        throw new Error("Please select a valid location on the map");
+      }
+      
+      if (!caseData.description) {
+        throw new Error("Please provide an emergency description");
+      }
+
       const response = await fetch("/api/cases", {
         method: "POST",
         headers: {
@@ -78,6 +92,10 @@ export default function CaseForm({ onComplete }: CaseFormProps) {
         const error = await response.json();
         throw new Error(error.message || "Failed to create case");
       }
+
+      // Dismiss loading toast and show success
+      toast.dismiss(loadingToast);
+      toast.success("New emergency case created successfully");
 
       setCaseData({
         patientName: "",
@@ -98,6 +116,11 @@ export default function CaseForm({ onComplete }: CaseFormProps) {
       }
     } catch (error: any) {
       console.error("Error creating case:", error);
+      
+      // Dismiss loading toast and show error
+      toast.dismiss(loadingToast);
+      toast.error(error.message || "An error occurred while creating the case");
+      
       setFormError(error.message || "An error occurred while creating the case.");
     } finally {
       setIsLoading(false);

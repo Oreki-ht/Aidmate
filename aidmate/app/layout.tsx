@@ -40,7 +40,31 @@ export default function RootLayout({
           <Header />
           <main className="flex-1 p-4 md:p-6 lg:p-8">
             {children}
-            <Toaster position="top-right" />
+            <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#fff',
+              color: '#363636',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              borderRadius: '0.5rem',
+              padding: '0.75rem 1rem',
+            },
+            success: {
+              style: {
+                borderLeft: '4px solid #10b981',
+              },
+              icon: '✅',
+            },
+            error: {
+              style: {
+                borderLeft: '4px solid #ef4444',
+              },
+              icon: '❌',
+            },
+          }}
+        />
           </main>
           <Footer />
         </body>

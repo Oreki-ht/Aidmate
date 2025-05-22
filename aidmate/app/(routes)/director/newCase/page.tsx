@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import CaseForm from "@/app/components/director/CaseForm";
 import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 
 export default function NewCasePage() {
   const { data: session, status } = useSession();
@@ -15,8 +16,10 @@ export default function NewCasePage() {
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
+      toast.error("Please login to access this page");
     } else if (session?.user?.role !== "MEDICAL_DIRECTOR") {
       router.push("/");
+      toast.error("You don't have permission to access this page");
     }
   }, [session, status, router]);
   

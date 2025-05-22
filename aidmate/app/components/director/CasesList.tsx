@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 type Paramedic = {
   id: string;
@@ -36,12 +37,17 @@ export default function CasesList() {
     const fetchCases = async () => {
       try {
         const response = await fetch("/api/cases");
-        if (!response.ok) throw new Error("Failed to fetch cases");
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to fetch cases");
+        }
         
         const data = await response.json();
         setCases(data.cases || []);
       } catch (err: any) {
-        setError(err.message || "An error occurred while fetching cases");
+        const errorMessage = err.message || "An error occurred while fetching cases";
+        setError(errorMessage);
+        toast.error(errorMessage); // Add toast error notification
         setCases([]);
       } finally {
         setLoading(false);
@@ -55,7 +61,10 @@ export default function CasesList() {
       setFetchingParamedics(true);
       try {
         const response = await fetch("/api/user?role=PARAMEDIC");
-        if (!response.ok) throw new Error("Failed to fetch paramedics");
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to fetch paramedics");
+        }
         
         const data = await response.json();
         
@@ -64,10 +73,12 @@ export default function CasesList() {
           setParamedics(data.users);
         } else {
           console.error("Paramedics data structure invalid:", data);
+          toast.error("Invalid data format received for paramedics"); // Add toast error
           setParamedics([]);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error fetching paramedics:", err);
+        toast.error(`Failed to load paramedics: ${err.message || "Unknown error"}`); // Add toast error
         setParamedics([]);
       } finally {
         setFetchingParamedics(false);
@@ -89,11 +100,13 @@ export default function CasesList() {
   const handleAssign = async (caseId: string) => {
     const paramedicId = paramedicSelections[caseId];
     if (!paramedicId) {
-      alert("Please select a paramedic first");
+      toast.error("Please select a paramedic first"); // Replace alert with toast
       return;
     }
     
     setAssigning(caseId);
+    const assignToast = toast.loading("Assigning case to paramedic..."); // Add loading toast
+    
     try {
       const response = await fetch(`/api/cases/${caseId}/assign`, {
         method: "POST",
@@ -121,6 +134,10 @@ export default function CasesList() {
           : c
       ));
       
+      // Show success toast and dismiss loading toast
+      toast.dismiss(assignToast);
+      toast.success(`Case successfully assigned to ${paramedics.find(p => p.id === paramedicId)?.name || 'paramedic'}`);
+      
       // Reset selection
       setParamedicSelections({
         ...paramedicSelections,
@@ -128,7 +145,8 @@ export default function CasesList() {
       });
     } catch (err: any) {
       console.error("Error assigning case:", err);
-      alert("Failed to assign case: " + (err.message || "Unknown error"));
+      toast.dismiss(assignToast);
+      toast.error(`Failed to assign case: ${err.message || "Unknown error"}`); // Replace alert with toast
     } finally {
       setAssigning(null);
     }
