@@ -52,7 +52,6 @@ export default function LoginPage() {
       
       if (result?.ok) {
         toast.dismiss(loadingToast);
-        toast.success("Login successful!");
         
       }
     } catch (error) {
