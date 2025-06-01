@@ -60,10 +60,10 @@ Format your response using Markdown:
 Additionally, for every response:
 1. Provide a **response** to the user's query.
 2. Generate **4 concise predictions** for possible user replies to your follow-up questions. These predictions should be short, relevant, and formatted as a list. For example:
-   - "She is unconscious."
-   - "She has a history of panic attacks."
-   - "She is breathing normally."
-   - "She is not responding."
+   - "They are unconscious."
+   - "They have a history of panic attacks."
+   - "They are breathing normally."
+   - "They are not responding."
 
 The predictions should be returned in a separate field in the API response, not as part of the main response text. Ensure the predictions are actionable and directly related to the follow-up questions.
 Separate the predictions from the main response with a clear delimiter which should always be Predictions: followed by the list of predictions.`;

@@ -16,6 +16,7 @@ export async function middleware(request: NextRequest) {
     '/',
     '/experimental',
     '/api/seed',
+    '/api/gemini',
   ];
   
   // Check if the path is public or a system path
