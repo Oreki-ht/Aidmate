@@ -125,12 +125,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-gray-600 text-sm">
-            <p>New medical professional?</p>
-            <p className="mt-1">
-              Contact your administrator to create an account.
-            </p>
-          </div>
         </div>
       </div>
     );

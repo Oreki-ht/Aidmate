@@ -88,14 +88,11 @@ function Header() {
           </Link>
           
           <div className="hidden md:flex space-x-1">
-            <Link href="/resources" className="px-3 py-2 text-md text-charcoal-light hover:text-primary rounded-md transition-colors">
-              Resources
+            <Link href="/" className="px-3 py-2 text-md text-charcoal-light hover:text-primary rounded-md transition-colors">
+              Home
             </Link>
             <Link href="/experimental" className="px-3 py-2 text-md text-charcoal-light hover:text-primary rounded-md transition-colors">
               AI Assistant
-            </Link>
-            <Link href="/about" className="px-3 py-2 text-md text-charcoal-light hover:text-primary rounded-md transition-colors">
-              About
             </Link>
           </div>
         </div>
@@ -174,11 +171,6 @@ function Footer() {
             <p className="text-sm text-charcoal-light mt-2">Advancing emergency response through technology</p>
           </div>
           
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/privacy" className="text-sm text-charcoal-light hover:text-primary">Privacy Policy</Link>
-            <Link href="/terms" className="text-sm text-charcoal-light hover:text-primary">Terms of Use</Link>
-            <Link href="/contact" className="text-sm text-charcoal-light hover:text-primary">Contact Us</Link>
-          </div>
         </div>
         <div className="mt-6 text-center text-xs text-charcoal-light">
           &copy; {new Date().getFullYear()} AidMate. All rights reserved.
