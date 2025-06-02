@@ -79,6 +79,15 @@ export default function CasePage() {
     }
   }, [status, router, session, caseId]);
 
+   useEffect(() => {
+    if (showReportForm && reportRef.current) {
+      // Timeout ensures the DOM is updated before scrolling
+      setTimeout(() => {
+        reportRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 50);
+    }
+  }, [showReportForm]);
+
   const fetchCaseData = async () => {
     setLoading(true);
     try {
@@ -274,7 +283,6 @@ export default function CasePage() {
                 <button 
                 onClick={() => {
                   setShowReportForm(true);
-                  scrollToReport();
                 }}
                 className="bg-mint-dark hover:bg-mint-dark/90 text-white px-4 py-2 rounded-md font-medium"
                 >
@@ -329,7 +337,6 @@ export default function CasePage() {
                   <span className="text-charcoal font-medium">{caseData.patientGender || "Unknown"}</span>
                 </div>
                 <div>
-                  <span className="text-charcoal-light block text-sm">Location:</span>
                   <div>
                     <span className="text-charcoal-light block text-sm">Location:</span>
                     {caseData.latitude && caseData.longitude ? (

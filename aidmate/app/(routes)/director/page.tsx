@@ -28,14 +28,6 @@ export default function DirectorDashboardPage() {
       fetchStatsSummary();
     }
   }, [session, status, router]);
-
-  useEffect(() => {
-    if (session?.user?.name) {
-      toast.success(`Welcome back, ${session.user.name}!`, {
-        icon: '👋',
-      });
-    }
-  }, [session?.user?.name]);
   
   // Fetch stats summary
     const fetchStatsSummary = async () => {
@@ -180,8 +172,56 @@ export default function DirectorDashboardPage() {
             </div>
           </motion.div>
         </Link>
+         <Link href="/director/registerParamedic">
+        <motion.div 
+          className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-4 hover:shadow-md transition-all duration-300 cursor-pointer"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          whileHover={{ scale: 1.02 }}
+        >
+          <div className="w-14 h-14 bg-mint-light/20 rounded-xl flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 text-mint-dark">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-charcoal">Register Paramedic</h3>
+            <p className="text-charcoal-light">Add a new paramedic to your team</p>
+          </div>
+          <div className="ml-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-charcoal-light">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </div>
+        </motion.div>
+      </Link>
+      <Link href="/director/paramedics">
+        <motion.div 
+          className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center gap-4 hover:shadow-md transition-all duration-300 cursor-pointer"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          whileHover={{ scale: 1.02 }}
+        >
+          <div className="w-14 h-14 bg-mint-light/20 rounded-xl flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7 text-mint-dark">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 010 3.75H5.625a1.875 1.875 0 010-3.75z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-charcoal">Manage Paramedics</h3>
+            <p className="text-charcoal-light">View and edit your paramedic team</p>
+          </div>
+          <div className="ml-auto">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-charcoal-light">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </div>
+        </motion.div>
+      </Link>
       </div>
-      
+    
       {/* Recent Activity - Optional */}
       <div className="mt-6 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-6">

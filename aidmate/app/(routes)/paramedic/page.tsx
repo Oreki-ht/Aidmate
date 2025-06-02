@@ -291,7 +291,7 @@ export default function ParamedicDashboardPage() {
                   availability ? "bg-mint-dark text-white" : "bg-gray-300 text-gray-700"
                 }`}
               >
-                {availability ? "Available" : "Unavailable"}
+                {availability ? "Current Status: Available" : "Current Status: Unavailable"}
               </button>
             </div>
           </div>

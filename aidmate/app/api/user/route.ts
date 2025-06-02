@@ -32,6 +32,10 @@ export async function GET(request: Request) {
         role: true,
         createdAt: true,
         updatedAt: true,
+        availability: true,
+        location: true,
+        latitude: true,
+        longitude: true,
       },
     });
 

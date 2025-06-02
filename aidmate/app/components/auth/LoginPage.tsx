@@ -35,8 +35,7 @@ export default function LoginPage() {
     const loadingToast = toast.loading("Logging in...");
 
     try {
-      // This makes NextAuth send a POST to /api/auth/callback/credentials
-      // NOT to /login directly
+      
       const result = await signIn("credentials", {
         redirect: false,
         email,
@@ -119,7 +118,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 rounded-lg transition-colors"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors"
               disabled={isLoading}
             >
               {isLoading ? "Logging in..." : "Login"}
