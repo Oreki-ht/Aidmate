@@ -145,9 +145,6 @@ function Header() {
               <Link href="/login" className="px-4 py-1.5 rounded-lg text-primary border border-primary/30 text-sm font-medium hover:bg-primary/5 transition-all">
                 Log In
               </Link>
-              <Link href="/register" className="px-4 py-1.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-all hidden md:block">
-                Register
-              </Link>
             </div>
           )}
         </div>
