@@ -442,12 +442,7 @@ export default function Home() {
                 >
                   Get Started
                 </Link>
-                <Link 
-                  href="/" 
-                  className="px-8 py-4 bg-primary-dark/30 text-white border border-white/30 font-medium rounded-xl text-center hover:bg-primary-dark/50 transition-all duration-300 hover:scale-105"
-                >
-                  Try Demo
-                </Link>
+                
               </motion.div>
             </div>
             <div className="relative hidden lg:block">

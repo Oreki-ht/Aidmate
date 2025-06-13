@@ -19,7 +19,7 @@ export default function NewCasePage() {
       toast.error("Please login to access this page");
     } else if (session?.user?.role !== "MEDICAL_DIRECTOR") {
       router.push("/");
-      toast.error("You don't have permission to access this page");
+      // toast.error("You don't have permission to access this page");
     }
   }, [session, status, router]);
   
