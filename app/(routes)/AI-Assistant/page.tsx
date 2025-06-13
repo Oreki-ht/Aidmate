@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
@@ -26,7 +25,8 @@ export default function Page() {
     if (!query.trim()) return;
 
     setMessages((prev) => [...prev, { role: "user", content: query }]);
-
+    setIsLoading(true);
+    
     try {
       const apiResponse = await fetch("/api/gemini", {
         method: "POST",

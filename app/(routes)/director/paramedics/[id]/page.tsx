@@ -37,6 +37,17 @@ export default function EditParamedicPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (/\d/.test(name)) {
+      toast.error("Name cannot contain numbers.");
+      return;
+    }
+
+    // Email validation: basic format check (e.g., user@domain.com)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch(`/api/user/${id}`, {

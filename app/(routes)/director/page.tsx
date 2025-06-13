@@ -271,7 +271,7 @@ export default function DirectorDashboardPage() {
             </div>
             <div>
               <p className="text-charcoal font-medium">Active Paramedics</p>
-              <p className="text-sm text-charcoal-light">There are {statsSummary.assignedCases + statsSummary.inProgressCases} paramedics currently on duty</p>
+              <p className="text-sm text-charcoal-light">There are {statsSummary.assignedCases + statsSummary.inProgressCases} paramedics currently attending to cases</p>
             </div>
           </div>
         </div>
