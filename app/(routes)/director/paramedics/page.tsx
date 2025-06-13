@@ -18,6 +18,8 @@ interface Paramedic {
 export default function ParamedicsPage() {
   const [paramedics, setParamedics] = useState<Paramedic[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+   const [currentPage, setCurrentPage] = useState(1); // Add state for current page
+  const itemsPerPage = 10; 
 
   useEffect(() => {
     const fetchParamedics = async () => {
@@ -37,6 +39,16 @@ export default function ParamedicsPage() {
 
     fetchParamedics();
   }, []);
+
+   const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentParamedics = paramedics.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(paramedics.length / itemsPerPage);
+
+  // Handle page change
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div className="max-w-7xl mx-auto mt-10">
@@ -81,7 +93,7 @@ export default function ParamedicsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {paramedics.map((paramedic) => (
+                {currentParamedics.map((paramedic) => (
                   <tr key={paramedic.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-charcoal">{paramedic.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-charcoal">{paramedic.email}</td>
@@ -105,6 +117,27 @@ export default function ParamedicsPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+        {totalPages > 1 && !isLoading && (
+          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1.5 bg-surface border border-gray-200 text-charcoal hover:bg-gray-50 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-charcoal-light">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1.5 bg-surface border border-gray-200 text-charcoal hover:bg-gray-50 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
           </div>
         )}
       </motion.div>
