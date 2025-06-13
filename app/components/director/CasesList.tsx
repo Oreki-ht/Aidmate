@@ -30,6 +30,8 @@ export default function CasesList() {
   const [assigning, setAssigning] = useState<string | null>(null);
   const [paramedicSelections, setParamedicSelections] = useState<Record<string, string>>({});
   const [filterStatus, setFilterStatus] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1); // Add state for current page
+  const itemsPerPage = 10;
   const router = useRouter();
 
   // Fetch cases
@@ -180,6 +182,17 @@ export default function CasesList() {
     ? cases 
     : cases.filter(c => c.status === filterStatus);
 
+     // Paginate filtered cases
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentCases = filteredCases.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredCases.length / itemsPerPage);
+
+  // Handle page change
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
       <div className="px-6 py-5 border-b border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -255,23 +268,23 @@ export default function CasesList() {
                     {caseItem.patientName || "Unknown"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-charcoal">
-  {caseItem.latitude && caseItem.longitude ? (
-    <a
-      href={`https://www.google.com/maps/search/?api=1&query=${caseItem.latitude},${caseItem.longitude}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-primary hover:text-primary-dark flex items-center"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-1">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-      </svg>
-      {caseItem.location.length > 25 ? caseItem.location.substring(0, 25) + "..." : caseItem.location}
-    </a>
-  ) : (
-    <span>{caseItem.location}</span>
-  )}
-</td>
+                    {caseItem.latitude && caseItem.longitude ? (
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${caseItem.latitude},${caseItem.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:text-primary-dark flex items-center"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-1">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                        </svg>
+                        {caseItem.location.length > 25 ? caseItem.location.substring(0, 25) + "..." : caseItem.location}
+                      </a>
+                    ) : (
+                      <span>{caseItem.location}</span>
+                    )}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSeverityColor(caseItem.severity)}`}>
                       {caseItem.severity}
@@ -342,6 +355,29 @@ export default function CasesList() {
           </table>
         </div>
       )}
+      <>
+      {totalPages > 1 && (
+          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1.5 bg-surface border border-gray-200 text-charcoal hover:bg-gray-50 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-charcoal-light">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1.5 bg-surface border border-gray-200 text-charcoal hover:bg-gray-50 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        )}
+        </>
     </div>
   );
 }
