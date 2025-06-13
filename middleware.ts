@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
   const publicPaths = [
     '/login',
     '/',
-    '/experimental',
+    '/AI-Assistant',
     '/api/seed',
     '/api/gemini',
   ];

@@ -91,7 +91,7 @@ function Header() {
             <Link href="/" className="px-3 py-2 text-md text-charcoal-light hover:text-primary rounded-md transition-colors">
               Home
             </Link>
-            <Link href="/experimental" className="px-3 py-2 text-md text-charcoal-light hover:text-primary rounded-md transition-colors">
+            <Link href="/AI-Assistant" className="px-3 py-2 text-md text-charcoal-light hover:text-primary rounded-md transition-colors">
               AI Assistant
             </Link>
           </div>
@@ -127,10 +127,6 @@ function Header() {
                   <Link href={session.user.role === "MEDICAL_DIRECTOR" ? "/director" : "/paramedic"} 
                     className="block px-4 py-2 text-lg text-charcoal hover:bg-primary/5 transition-colors">
                     Dashboard
-                  </Link>
-                  <Link href="/profile" 
-                    className="block px-4 py-2 text-lg text-charcoal hover:bg-primary/5 transition-colors">
-                    Profile
                   </Link>
                   <hr className="my-1 border-gray-100" />
                   <Link href="/api/auth/signout" 

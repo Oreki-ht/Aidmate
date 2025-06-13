@@ -196,6 +196,8 @@ export default function CasePage() {
   const handleSubmitReport = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmittingReport(true);
+    const loadingToastId = toast.loading("Submitting medical report..."); 
+
     
     try {
       const response = await fetch(`/api/cases/${caseId}/complete`, {
@@ -204,7 +206,12 @@ export default function CasePage() {
         body: JSON.stringify(reportData),
       });
       
-      if (!response.ok) throw new Error("Failed to submit report");
+      if (!response.ok) {
+        toast.dismiss(loadingToastId); // Dismiss loading toast on error
+        const errorData = await response.json();
+        toast.error(errorData.message || "Failed to submit report");
+        throw new Error(errorData.message || "Failed to submit report");
+      }
       
       const data = await response.json();
       
@@ -219,9 +226,19 @@ export default function CasePage() {
       });
       
       setShowReportForm(false);
-    } catch (err) {
+      toast.dismiss(loadingToastId); // Dismiss loading toast on success
+      toast.success("Case completed successfully!", { 
+        id: 'case-completed',
+        duration: 4000,
+        icon: '✅',
+      });
+    } catch (err: any) {
       console.error("Error submitting report:", err);
-      alert("Failed to submit medical report. Please try again.");
+      toast.dismiss(loadingToastId); 
+      // Error toast is handled above if response is not ok, this catches other errors
+      if (!(err.message && err.message.includes("Failed to submit report"))) {
+         toast.error(err.message || "Failed to submit medical report. Please try again.");
+      }
     } finally {
       setSubmittingReport(false);
     }
@@ -283,6 +300,10 @@ export default function CasePage() {
                 <button 
                 onClick={() => {
                   setShowReportForm(true);
+                  toast('Please fill out the medical report to complete the case.', {
+                    icon: '📝',
+                    duration: 4000,
+                  });
                 }}
                 className="bg-mint-dark hover:bg-mint-dark/90 text-white px-4 py-2 rounded-md font-medium"
                 >

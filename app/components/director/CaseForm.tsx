@@ -69,6 +69,10 @@ export default function CaseForm({ onComplete }: CaseFormProps) {
 
     try {
       // Form validation
+      if (caseData.patientName && !/^[a-zA-Z\s]*$/.test(caseData.patientName)) {
+        throw new Error("Patient name can only contain letters and spaces.");
+      }
+
       if (!caseData.location || caseData.latitude === 0 || caseData.longitude === 0) {
         throw new Error("Please select a valid location on the map");
       }

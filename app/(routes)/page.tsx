@@ -111,7 +111,7 @@ export default function Home() {
                 )}
                 
                 <Link 
-                  href="/experimental" 
+                  href="/AI-Assistant" 
                   className="px-6 py-3.5 bg-white text-primary font-medium rounded-xl border border-primary/20 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300 hover:scale-105"
                 >
                   Try AI Assistant
@@ -443,7 +443,7 @@ export default function Home() {
                   Get Started
                 </Link>
                 <Link 
-                  href="/experimental" 
+                  href="/" 
                   className="px-8 py-4 bg-primary-dark/30 text-white border border-white/30 font-medium rounded-xl text-center hover:bg-primary-dark/50 transition-all duration-300 hover:scale-105"
                 >
                   Try Demo

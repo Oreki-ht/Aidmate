@@ -7,7 +7,7 @@ import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 import toast from "react-hot-toast"; 
 
-export default function ExperimentalPage() {
+export default function Page() {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<

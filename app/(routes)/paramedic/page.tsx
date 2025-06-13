@@ -72,17 +72,22 @@ export default function ParamedicDashboardPage() {
     return;
   }
   
-  if (Notification.permission === 'granted') {
-    setNotificationsEnabled(true);
-    setShowNotificationBtn(false);
-    // Show a toast indicating notifications are already enabled
-    toast.success('Notifications are already enabled', {
-      id: 'notifications-enabled',
-      duration: 3000,
-      icon: '🔔',
-    });
-  }
-}, []);
+  const notificationCheckPerformed = sessionStorage.getItem('notificationCheckPerformed');
+
+    if (Notification.permission === 'granted') {
+      setNotificationsEnabled(true);
+      setShowNotificationBtn(false);
+      // Show a toast indicating notifications are already enabled, only if not shown before in this session
+      if (!notificationCheckPerformed) {
+        toast.success('Notifications are already enabled', {
+          id: 'notifications-enabled',
+          duration: 3000,
+          icon: '🔔',
+        });
+        sessionStorage.setItem('notificationCheckPerformed', 'true');
+      }
+    }
+  }, []);
 
   const registerForNotifications = async () => {
   try {
@@ -361,7 +366,7 @@ export default function ParamedicDashboardPage() {
           </p>
           
           <button 
-            onClick={() => router.push('/experimental')}
+            onClick={() => router.push('/AI-Assistant')}
             className="mt-auto w-full bg-white border border-gray-200 text-primary hover:bg-primary/5 transition-all font-medium py-2.5 rounded-xl flex items-center justify-center gap-2"
           >
             Open Assistant
