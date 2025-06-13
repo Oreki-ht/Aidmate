@@ -66,6 +66,7 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
   session: {
+    maxAge: 24* 60 * 60,
     strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
