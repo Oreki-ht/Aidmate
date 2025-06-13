@@ -262,7 +262,7 @@ export default function CasesList() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredCases.map((caseItem) => (
+              {currentCases.map((caseItem) => (
                 <tr key={caseItem.id} className="hover:bg-surface transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-charcoal">
                     {caseItem.patientName || "Unknown"}
