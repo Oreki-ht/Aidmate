@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     const genAI = new GoogleGenerativeAI(apiKey);
     
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash-preview-05-20",
+      model: "gemini-2.5-flash-preview-09-2025",
     });
     
     const systemPrompt = `You are a medical assistant AI specialized ONLY in first aid and emergency response procedures. 
